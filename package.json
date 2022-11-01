@@ -6,9 +6,11 @@
   "author": "agcodex01 <agcodex01@gmail.com>",
   "private": true,
   "scripts": {
+    "build": "quasar build -m android",
     "android": "quasar dev -m cordova -T android --ide",
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "cordova:build": "quasar build -m cordova -T android --buildConfig=\"/build.cordova.json\""
   },
   "dependencies": {
     "pinia": "^2.0.11",

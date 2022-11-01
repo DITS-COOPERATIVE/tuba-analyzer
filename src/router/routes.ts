@@ -14,7 +14,18 @@ const routes: RouteRecordRaw[] = [
         path: 'connection',
         name: 'connection',
         component: () => import('pages/ConnectionPage.vue')
-      }]
+      },
+      {
+        path: 'test-page',
+        name: 'test',
+        component: () => import('pages/TestPage.vue')
+      },
+      {
+        path: 'result',
+        name: 'result',
+        component: () => import('pages/ResultPage.vue')
+      }
+    ]
   },
 
   // Always leave this as last one,
