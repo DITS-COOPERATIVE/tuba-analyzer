@@ -185,7 +185,17 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-webpack/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true
+      hideSplashscreen: true,
+      plugins: {
+        BluetoothLe: {
+          displayStrings: {
+            scanning: "Scanning...",
+            cancel: "Cancel",
+            availableDevices: "Available devices",
+            noDeviceFound: "No device found"
+          }
+        }
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-webpack/developing-electron-apps/configuring-electron

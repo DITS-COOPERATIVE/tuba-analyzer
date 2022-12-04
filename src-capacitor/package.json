@@ -1,0 +1,15 @@
+{
+  "name": "tuba-analyzer",
+  "version": "0.0.1",
+  "description": "Tuba analyzer using PH, Turbidity, Alcohol level",
+  "author": "agcodex01 <agcodex01@gmail.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor-community/bluetooth-le": "^1.1.1",
+    "@capacitor/android": "^3.0.0-beta.0",
+    "@capacitor/app": "^0.3.3",
+    "@capacitor/cli": "^3.0.0-beta.1",
+    "@capacitor/core": "^3.0.0-beta.1",
+    "@capacitor/splash-screen": "^0.3.3"
+  }
+}
