@@ -97,7 +97,7 @@ export default defineComponent({
         between(resultStore.turbidity, 0.59, 2.1) &&
         between(resultStore.acidity, 563, 690)
       ) {
-        resultStore.result = 'SUOY'
+        resultStore.result = 'COCONUT VINEGAR'
       } else if (
         between(resultStore.ph, 4.51, 5.08) &&
         between(resultStore.turbidity, 1.62, 2.08) &&

@@ -7,7 +7,7 @@
         src="~/assets/logo.png"
         style="width: 200px; heigth: 200px"
       ></q-img>
-      <div class="text-h3 q-my-md">{{ resultStore.result }}</div>
+      <div class="text-h4 q-my-md">{{ resultStore.result }}</div>
       <div
         class="flex justify-evenly shadow-3 full-width q-py-md q-px-none rounded-borders"
       >
