@@ -64,6 +64,7 @@
 import { defineComponent, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useResultStore } from 'src/stores/result.store'
+import { api } from 'src/boot/axios'
 
 export default defineComponent({
   name: 'TestPage',
@@ -78,42 +79,50 @@ export default defineComponent({
       analyzing.value = true
       clearInterval(interval)
 
-      setTimeout(() => {
-        analyzing.value = false
-        process()
-        router.push({
-          name: 'result'
+      api
+        .post('/process', {
+          ph: resultStore.ph,
+          av: resultStore.acidity,
+          tb: resultStore.turbidity
         })
-      }, 3000)
+        .then(({ data }) => {
+          resultStore.result = data
+          router.push({
+            name: 'result'
+          })
+        })
+        .finally(() => {
+          analyzing.value = false
+        })
     }
 
-    function between (x: number, min: number, max: number) {
-      return x >= min && x <= max
-    }
+    // function between (x: number, min: number, max: number) {
+    //   return x >= min && x <= max
+    // }
 
-    function process () {
-      if (
-        between(resultStore.ph, 2.62, 4.03) &&
-        between(resultStore.turbidity, 0.59, 2.1) &&
-        between(resultStore.acidity, 563, 690)
-      ) {
-        resultStore.result = 'COCONUT VINEGAR'
-      } else if (
-        between(resultStore.ph, 4.51, 5.08) &&
-        between(resultStore.turbidity, 1.62, 2.08) &&
-        between(resultStore.acidity, 699, 725)
-      ) {
-        resultStore.result = 'BAHAL'
-      } else if (
-        between(resultStore.ph, 4, 4.32) &&
-        between(resultStore.turbidity, 1.73, 2.11) &&
-        between(resultStore.acidity, 663, 693)
-      ) {
-        resultStore.result = 'BAHALINA'
-      } else {
-        resultStore.result = 'OUT OF SCOPE'
-      }
-    }
+    // function process () {
+    //   if (
+    //     between(resultStore.ph, 2.62, 4.03) &&
+    //     between(resultStore.turbidity, 0.59, 2.1) &&
+    //     between(resultStore.acidity, 563, 690)
+    //   ) {
+    //     resultStore.result = 'COCONUT VINEGAR'
+    //   } else if (
+    //     between(resultStore.ph, 4.51, 5.08) &&
+    //     between(resultStore.turbidity, 1.62, 2.08) &&
+    //     between(resultStore.acidity, 699, 725)
+    //   ) {
+    //     resultStore.result = 'BAHAL'
+    //   } else if (
+    //     between(resultStore.ph, 4, 4.32) &&
+    //     between(resultStore.turbidity, 1.73, 2.11) &&
+    //     between(resultStore.acidity, 663, 693)
+    //   ) {
+    //     resultStore.result = 'BAHALINA'
+    //   } else {
+    //     resultStore.result = 'OUT OF SCOPE'
+    //   }
+    // }
 
     function randomNumber (min: number, max: number) {
       const rand = Math.random() * (max - min) + min
@@ -123,9 +132,16 @@ export default defineComponent({
 
     onMounted(() => {
       interval = setInterval(() => {
-        resultStore.ph = randomNumber(2.62, 5.08)
-        resultStore.turbidity = randomNumber(0.59, 2.11)
-        resultStore.acidity = randomNumber(563, 725)
+        api
+          .get('/sensors')
+          .then(({ data }) => {
+            console.log(data)
+          })
+          .catch(() => {
+            resultStore.ph = randomNumber(2.62, 5.08)
+            resultStore.turbidity = randomNumber(0.59, 2.11)
+            resultStore.acidity = randomNumber(563, 725)
+          })
       }, 1000)
     })
 
