@@ -16,7 +16,7 @@
             :key="item"
             v-model="item.expanded"
             :label="`TA-${item.id} (${item.status})`"
-            :caption="item.label"
+            :caption="`Purchase Date: ${item.purchase_date}`"
           >
             <div class="text-subtitle2 q-mb-sm text-center full-width">
               Test Results
@@ -51,7 +51,7 @@
               label="Test Again"
               color="accent"
               class="q-mr-sm"
-              @click="testAgain(key, item.id, item.label)"
+              @click="testAgain(key, item.id, item.purchase_date)"
             ></q-btn>
             <q-btn
               v-if="item.status !== 'SOLD'"
@@ -87,13 +87,13 @@ export default defineComponent({
       localStorage.setItem('inventory', JSON.stringify(inventory.results))
     }
 
-    function testAgain (key, id, label) {
+    function testAgain (key, id, purchaseDate) {
       router.push({
         name: 'test',
         query: {
           id,
           key,
-          label
+          purchaseDate
         }
       })
     }

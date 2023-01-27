@@ -1,29 +1,44 @@
-#define PH_ANALOG A1
+// #include <SoftwareSerial.h>
+#include "DFRobot_PH.h"
 
-float ph, turbidity, alcohol = 0;
+// SoftwareSerial bluetooth(1, 0); //RX, TX
+DFRobot_PH ph;
 
-void setup() {
-  // put your setup code here, to run once:
+void setup()
+{
   Serial.begin(9600);
+  //  bluetooth.begin(9600);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  ph = (float)analogRead(A0) * (5.0 / 1024 / 6);
-  turbidity = analogRead(A1) * (5.0 / 1024.0);
-  alcohol = analogRead(A2);
+void loop()
+{
+  static unsigned long timepoint = millis();
+  if (millis() - timepoint > 1000U) {
 
-  display(ph, turbidity, alcohol);
+    timepoint = millis();
+    float ph =  getPh();
+    float tb =  getTurbidity();
+    float al =  getAlcohol();
+    String temp = "";
+    temp += String(ph, 2);
+    temp += ",";
+    temp += String(tb, 2);
+    temp += ",";
+    temp += String(al, 2);
+    Serial.println(temp);
+  }
 
-  delay(1000);
 }
 
+float getPh() {
+  float voltage = analogRead(A0) / 1024.0 * 5000;
+  return ph.readPH(voltage , 25);
+}
 
-void display(float ph, float turbidity, float alcohol) {
-  Serial.print("PH: ");
-  Serial.print(ph);
-  Serial.print(", Turbidity: ");
-  Serial.print(turbidity);
-  Serial.print(", Acidity: ");
-  Serial.println(alcohol);
+float getAlcohol() {
+  return analogRead(A1);
+}
+
+float getTurbidity() {
+  return analogRead(A2) * (5.0 / 1024.0);
 }

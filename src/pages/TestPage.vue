@@ -98,7 +98,7 @@
         </q-list>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="previewAnalyze">
+    <q-dialog v-model="previewAnalyze" @hide="cancel">
       <q-card style="width: 304px" class="q-pa-md q-gutter-sm">
         <div class="text-subtitle2">Scan Other Data</div>
 
@@ -108,12 +108,29 @@
           outlined
           :readonly="fromInventory"
         />
-        <q-input v-model="scanData.label" label="Label" outlined />
+        <q-input v-model="scanData.purchase_date" label="Purchase Date" mask="date" :rules="['date']" outlined>
+          <template v-slot:append>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-date v-model="scanData.purchase_date">
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
 
         <q-btn
           label="Continue"
           class="full-width"
           color="primary"
+          :disable="!scanData.purchase_date || !scanData.purchase_from"
           :loading="analyzing"
           @click="analyze()"
         >
@@ -147,7 +164,6 @@ import { api } from 'src/boot/axios'
 import { useQuasar } from 'quasar'
 import { useInventoryStore } from 'src/stores/inventory.store'
 
-console.log('P', window.bluetoothSerial)
 const bluetooth = window.bluetoothSerial
 export default defineComponent({
   name: 'TestPage',
@@ -158,8 +174,8 @@ export default defineComponent({
     const analyzing = ref(false)
     const router = useRouter()
     const resultStore = useResultStore()
-    const enable = ref(false)
-    const connected = ref(false)
+    const enable = ref(true)
+    const connected = ref(true)
     const openScan = ref(false)
     const devices = ref([])
     const connecting = ref(false)
@@ -167,7 +183,7 @@ export default defineComponent({
     const previewAnalyze = ref(false)
     const scanData = ref({
       analyzed_at: '',
-      label: '',
+      purchase_date: '',
       purchase_from: '',
       type: '',
       id: null
@@ -193,7 +209,7 @@ export default defineComponent({
             id: scanData.value.id
               ? scanData.value.id
               : parseInt(localStorage.getItem('total-item') || '0') + 1,
-            label: scanData.value.label,
+            purchase_date: scanData.value.purchase_date,
             status: 'STOCK',
             sensors: {
               ph: resultStore.ph,
@@ -220,19 +236,24 @@ export default defineComponent({
 
     function subscribe () {
       bluetooth.subscribeRawData(data => {
-        if (data) {
-          const enc = new TextDecoder('utf-8')
-          console.log('DATA 3', enc.decode(data))
-          const outputs = enc.decode(data).split(',')
+        const enc = new TextDecoder('utf-8')
+        console.log('DECODE DATA', enc.decode(data))
+        const outputs = enc.decode(data).split(',')
+        console.log('SPLIT DATA', outputs)
+
+        if (outputs[0] && outputs[1] && outputs[2]) {
           if (outputs[0] && !isNaN(outputs[0])) {
+            console.log('DATA PH: ', outputs[0])
             resultStore.ph = parseFloat(outputs[0])
           }
 
           if (outputs[1] && !isNaN(outputs[1])) {
+            console.log('DATA TB ', outputs[1])
             resultStore.turbidity = parseFloat(outputs[1])
           }
 
           if (outputs[2] && !isNaN(outputs[2])) {
+            console.log('DATA AL', outputs[2])
             resultStore.acidity = parseFloat(outputs[2])
           }
         }
@@ -283,6 +304,12 @@ export default defineComponent({
 
     function previewScan () {
       previewAnalyze.value = true
+      bluetooth.unsubscribeRawData()
+    }
+
+    function cancel () {
+      previewAnalyze.value = false
+      subscribe()
     }
 
     onMounted(() => {
@@ -309,7 +336,7 @@ export default defineComponent({
         fromInventory.value = true
         scanData.value.id = route.query.id
         scanData.value.purchase_from = route.query.key
-        scanData.value.label = route.query.label
+        scanData.value.purchase_date = route.query.purchaseDate
       }
     })
 
@@ -329,7 +356,8 @@ export default defineComponent({
       previewAnalyze,
       previewScan,
       scanData,
-      fromInventory
+      fromInventory,
+      cancel
     }
   }
 })

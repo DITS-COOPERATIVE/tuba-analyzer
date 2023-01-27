@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export interface Result {
   analyzed_at: string
-  label: string
+  purchase_date: string
   purchase_from: string
   type: string
   id: string
@@ -40,7 +40,7 @@ export const useInventoryStore = defineStore('inventory', {
         if (!exists) {
           resultData.push({
             expanded: false,
-            label: result.label,
+            purchase_date: result.purchase_date,
             id: result.id,
             status: result.status,
             tests: [
@@ -56,9 +56,9 @@ export const useInventoryStore = defineStore('inventory', {
           localStorage.setItem('total-item', result.id)
         } else {
           resultData.forEach(
-            (item: { id: string; label: string; tests: ScanData[] }) => {
+            (item: { id: string; purchase_date: string; tests: ScanData[] }) => {
               if (parseInt(item.id) === parseInt(result.id)) {
-                item.label = result.label
+                item.purchase_date = result.purchase_date
                 item.tests.push({
                   classification: result.type,
                   analyzed_on: new Date().toDateString(),
@@ -76,7 +76,7 @@ export const useInventoryStore = defineStore('inventory', {
         this.results[result.purchase_from] = [
           {
             expanded: false,
-            label: result.label,
+            purchase_date: result.purchase_date,
             id: result.id,
             status: result.status,
             tests: [
